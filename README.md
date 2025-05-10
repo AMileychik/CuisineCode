@@ -158,7 +158,7 @@ Covers key scenarios:
 ### Screenshots
 
 ### Onboarding
-![Onboarding](Screenshots/Onboarding.png)
+![Onboarding](https://raw.githubusercontent.com/AMileychik/CuisineCode/main/CuisineCode/Screenshots/Onboarding.png)
 
 ### RecipeList
 ![Recipe List 1](Screenshots/RecipeList_1.png)
