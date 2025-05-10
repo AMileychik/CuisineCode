@@ -157,9 +157,41 @@ Covers key scenarios:
 
 ### Screenshots
 
-| Onboarding | Favorites |
-|------------|-----------|
-| ![](Screenshots/onboarding.png) | ![](Screenshots/favorites.png) |
+### Onboarding
+![Onboarding](Screenshots/Onboarding.png)
+
+### RecipeList
+![Recipe List 1](Screenshots/RecipeList_1.png)
+![Recipe List 2](Screenshots/RecipeList_2.png)
+
+### RecipeDetail
+![Recipe Detail 1](Screenshots/RecipeDetail_1.png)
+![Recipe Detail 2](Screenshots/RecipeDetail_2.png)
+
+### Favorites
+![Favorites](Screenshots/Favorites.png)
+
+**Onboarding/**
+<div style="display: flex; gap: 10px;">
+  <img src="Screenshots/Onboarding.png" alt="Onboarding" width="333"/>
+</div>
+
+**RecipeList/**
+<div style="display: flex; gap: 10px;">
+  <img src="Screenshots/RecipeList_1.png" alt="Recipe List 1" width="333"/>
+  <img src="Screenshots/RecipeList_2.png" alt="Recipe List 2" width="333"/>
+</div>
+
+**RecipeDetail/**
+<div style="display: flex; gap: 10px;">
+  <img src="Screenshots/RecipeDetail_1.png" alt="Recipe Detail 1" width="333"/>
+  <img src="Screenshots/RecipeDetail_2.png" alt="Recipe Detail 2" width="333"/>
+</div>
+
+**Favorites/**
+<div style="display: flex; gap: 10px;">
+  <img src="Screenshots/Favorites.png" alt="Favorites" width="333"/>
+</div>
 
 ---
 
