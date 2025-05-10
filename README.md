@@ -157,27 +157,9 @@ Covers key scenarios:
 
 ### Screenshots
 
-**Onboarding/**
-<div style="display: flex; gap: 10px;">
-  <img src="Screenshots/Onboarding.png" alt="Onboarding" width="333"/>
-</div>
-
-**RecipeList/**
-<div style="display: flex; gap: 10px;">
-  <img src="Screenshots/RecipeList_1.png" alt="Recipe List 1" width="333"/>
-  <img src="Screenshots/RecipeList_2.png" alt="Recipe List 2" width="333"/>
-</div>
-
-**RecipeDetail/**
-<div style="display: flex; gap: 10px;">
-  <img src="Screenshots/RecipeDetail_1.png" alt="Recipe Detail 1" width="333"/>
-  <img src="Screenshots/RecipeDetail_2.png" alt="Recipe Detail 2" width="333"/>
-</div>
-
-**Favorites/**
-<div style="display: flex; gap: 10px;">
-  <img src="Screenshots/Favorites.png" alt="Favorites" width="333"/>
-</div>
+| Onboarding | Favorites |
+|------------|-----------|
+| ![](Screenshots/Onboarding.png) | ![](Screenshots/Favorites.png) |
 
 ---
 
