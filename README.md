@@ -159,7 +159,7 @@ Covers key scenarios:
 
 | Onboarding | Favorites |
 |------------|-----------|
-| ![](Screenshots/Onboarding.png) | ![](Screenshots/Favorites.png) |
+| ![](Screenshots/onboarding.png) | ![](Screenshots/favorites.png) |
 
 ---
 
