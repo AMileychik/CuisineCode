@@ -165,7 +165,7 @@ Covers key scenarios:
 ![Recipe List 2](Screenshots/RecipeList_2.png)
 
 ### RecipeDetail
-![Recipe Detail 1](Screenshots/RecipeDetail_1.png)
+![Recipe Detail 1](https://raw.githubusercontent.com/AMileychik/CuisineCode/main/Screenshots/Onboarding.png)
 ![Recipe Detail 2](Screenshots/RecipeDetail_2.png)
 
 ### Favorites
