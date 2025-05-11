@@ -63,7 +63,6 @@ struct RecipeListView: View {
                                 // ——— FETCH BANNER ———
                                 if !showFavorites {
                                     FetchBannerView {
-                                        //              isNameFieldFocused = false
                                         if let url = viewModel.bannerURL {
                                             safariService.open(url: url, in: $isShowingWebView, selectedURL: $selectedURL)
                                         }

@@ -11,25 +11,25 @@ The project follows clean architecture principles with a focus on modularity, te
 
 ### Features
 
-**RecipeList/**
+**Onboarding**
+
+- User name entry on first launch using `@AppStorage`  
+
+**RecipeList**
 
 - Time-based greeting for the user  
 - Search and filtering by cuisine  
 - Banner with external link (Fetch) via `SFSafariViewController`  
-- Recipe loading from local JSON (adaptive `LazyVGrid` layout)  
+- Recipe loading from JSON (adaptive `LazyVGrid` layout)  
 
-**RecipeDetail/**
+**RecipeDetail**
 
 - Displays recipe image, description, and cuisine  
 - Favorite toggle  
 - “Watch Recipe” and “Video” buttons using `SFSafariViewController`  
 - Horizontal partner slider with external links  
 
-**Onboarding/**
-
-- User name entry on first launch using `@AppStorage`  
-
-**Favorites/**
+**Favorites**
 
 - Animated “Favorites” header  
 - Separate list of favorited recipes  
@@ -52,7 +52,6 @@ Main development priorities:
 **NetworkService/**
 
 Asynchronously loads recipes from a remote source using `URLSession`.  
-Handles HTTP status and decoding errors (`RecipeResponse`). Used in `RecipeListViewModel`.
 - Architecture: Protocol + Implementation (`NetworkServiceProtocol`)  
 - Errors: `NetworkError.statusCode`, `NetworkError.decodingError`  
 
@@ -98,6 +97,9 @@ Uses `Binding<Bool>` and `Binding<URL?>` for controlled modal presentation.
 ### Trade-offs and Decisions
 
 - Using Dependency Injection (DI) via EnvironmentKey — a solution that simplifies access to services in different parts of the app but requires additional effort for setup and testing. It provides flexibility in changing dependencies, but also increases the complexity of understanding the architecture.
+
+-  Using MVVM architecture — improves separation of concerns by keeping UI logic in the ViewModel, making the codebase more testable and maintainable. However, in SwiftUI, ViewModels can sometimes grow too large if not carefully structured, and binding complex UI states may introduce boilerplate or lead to tight coupling between Views and ViewModels.
+
 - Separating image loading and caching logic into a dedicated service (ImageLoaderService) enhances reusability and testability, but increases coupling by manually passing dependencies into each View/Model.
 
 ---
@@ -105,7 +107,12 @@ Uses `Binding<Bool>` and `Binding<URL?>` for controlled modal presentation.
 ### Weakest Part of the Project
 
 - Incomplete test coverage — although the ViewModel (RecipeListViewModel) is covered by tests, other services such as FavoritesService, ImageLoaderService, and SafariService are not tested, which makes it harder to maintain and extend the code in the future.
+
 - Lack of full support for different devices and orientations — the app’s interface is not optimized for all device types and orientations, which may lead to inconveniences for users on certain devices.
+
+- Insufficient error transparency — users are not always informed about the nature of an error (e.g., “data format error”), which can reduce trust in the app and complicate debugging.
+
+- Missing visual feedback during loading — the absence of shimmer or skeleton views can lead to a perception of slowness or broken functionality, especially on slower networks.
 
 ---
 
@@ -114,7 +121,6 @@ Uses `Binding<Bool>` and `Binding<URL?>` for controlled modal presentation.
 The architecture is designed with scalability in mind and easy integration of additional features, such as:
 - User profile support
 - Favorites synchronization with the server
-- Simple local storage via @AppStorage
 - Centralized and testable dependency management using EnvironmentKey
 - Image caching for improved performance
 - Easy service replacement during testing through protocols
@@ -126,15 +132,15 @@ The architecture is designed with scalability in mind and easy integration of ad
 **RecipeListViewModelTests**  
 
 Covers key scenarios:
-1. `testLoadRecipesSuccessUpdatesStateToLoaded`  
-2. `testLoadRecipesFailureUpdatesStateToError`  
-3. `testFilterRecipesByNameAndCuisine`  
-4. `testFilterByCuisine`  
-5. `testResetFilterRestoresAllRecipes`  
-6. `testUniqueCuisinesAreSortedAndUnique`  
-7. `testInitialStateIsIdle`  
-8. `testMultipleLoadCallsResultInSameRecipes`  
-9. `testEmptyRecipesUpdatesStateToLoadedWithEmptyArray`  
+- `testLoadRecipesSuccessUpdatesStateToLoaded`  
+- `testLoadRecipesFailureUpdatesStateToError`  
+- `testFilterRecipesByNameAndCuisine`  
+- `testFilterByCuisine`  
+- `testResetFilterRestoresAllRecipes`  
+- `testUniqueCuisinesAreSortedAndUnique`  
+- `testInitialStateIsIdle`  
+- `testMultipleLoadCallsResultInSameRecipes`  
+- `testEmptyRecipesUpdatesStateToLoadedWithEmptyArray`  
 
 ---
 
@@ -151,7 +157,7 @@ Covers key scenarios:
 
 ### Constants and resources using Flyweight pattern 
 
-- `Images.swift`, `Texts.swift` — constants and resources using Flyweight pattern  
+- `Images.swift`, `Texts.swift` - centralized reuse of static UI constants to reduce memory usage and ensure consistency.
 
 ---
 
@@ -183,7 +189,7 @@ Covers key scenarios:
 
 ### Contact  
 **Developer:** Alexander Mileychik  
-**GitHub:** [github.com/AMileychik/CuisineCode](https://github.com/AMileychik/CuisineCode)  
+**GitHub:** [github.com/AMileychik/CuisineCode](https://github.com/AMileychik)  
 **Email:** amileychik@gmail.com
 
 ---

@@ -8,8 +8,10 @@
 import SwiftUI
 
 struct RecipeListView_Previews: PreviewProvider {
+    
     static var previews: some View {
         RecipeListView(container: DependencyContainer(), showFavorites: false)
+        
         RecipeListView(container: DependencyContainer(), showFavorites: true)
     }
 }
