@@ -14,6 +14,7 @@ The project follows clean architecture principles with a focus on modularity, te
 **Onboarding**
 
 - User name entry on first launch using `@AppStorage`  
+- Onboarding screen will appear only once when the app is launched for the first time. To reset it, delete the app from simulator/device.
 
 **RecipeList**
 
