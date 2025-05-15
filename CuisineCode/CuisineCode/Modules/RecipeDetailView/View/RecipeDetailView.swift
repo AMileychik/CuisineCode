@@ -9,10 +9,13 @@ import SwiftUI
 
 struct RecipeDetailView: View {
     
-    @Environment(\.dependencyContainer) private var container
     @StateObject var viewModel: RecipeDetailViewModel
     @State private var isShowingWebView: Bool = false
     @State private var selectedURL: URL?
+    
+    init(viewModel: RecipeDetailViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
     
     var body: some View {
         Group() {
@@ -21,7 +24,7 @@ struct RecipeDetailView: View {
                     // ——— RECIPE IMAGE ———
                     RecipeImageView(
                         url: viewModel.photoURLLarge,
-                        imageLoaderService: container.imageLoaderService
+                        imageLoaderService: viewModel.imageLoaderService
                     )
                     // ——— RECIPE INFO ———
                     VStack(alignment: .leading) {

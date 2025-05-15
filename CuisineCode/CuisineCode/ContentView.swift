@@ -8,25 +8,27 @@
 import SwiftUI
 
 struct ContentView: View {
-    @ObservedObject var container: DependencyContainer
-
+    
+    @ObservedObject var recipeListViewModel: RecipeListViewModel
+    
+    let viewModelFactory = ViewModelFactory()
+    
     var body: some View {
         TabView {
-            RecipeListView(container: container)
+            RecipeListView(viewModel: recipeListViewModel, viewModelFactory: viewModelFactory)
                 .tabItem {
                     Label("Recipes", systemImage: "book")
                 }
-
-            RecipeListView(container: container, showFavorites: true)
+            
+            RecipeListView(viewModel: recipeListViewModel, viewModelFactory: viewModelFactory, showFavorites: true)
                 .tabItem {
                     Label("Favorites", systemImage: "heart")
                 }
         }
-        .environment(\.dependencyContainer, container)
     }
 }
 
 #Preview {
-    ContentView(container: DependencyContainer())
+    ContentView(recipeListViewModel: ViewModelFactory().makeRecipeListViewModel())
 }
 

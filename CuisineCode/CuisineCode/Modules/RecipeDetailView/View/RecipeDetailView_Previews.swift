@@ -8,30 +8,26 @@
 import SwiftUI
 
 struct RecipeDetailView_Previews: PreviewProvider {
+    
     static var previews: some View {
-        let container = DependencyContainer.preview
         
         let viewModel = RecipeDetailViewModel(
             recipe: .mock,
             favoritesService: MockFavoritesService(),
-            imageLoaderService: container.imageLoaderService, 
-            safariService: container.safariService
+            imageLoaderService: MockImageLoaderService(),
+            safariService: MockSafariService()
         )
         
         viewModel.isDataLoaded = true
         
         return RecipeDetailView(viewModel: viewModel)
-            .environment(\.dependencyContainer, container)
     }
 }
 
+// MARK: - Моки
+
 final class MockFavoritesService: FavoritesServiceProtocol {
-    
     var favoriteIDs: Set<String> = []
-    
-    init(favoriteIDs: Set<String> = []) {
-        self.favoriteIDs = favoriteIDs
-    }
     
     func isFavorite(_ id: UUID) -> Bool {
         favoriteIDs.contains(id.uuidString)
@@ -48,12 +44,8 @@ final class MockFavoritesService: FavoritesServiceProtocol {
 }
 
 final class MockImageLoaderService: ImageLoaderServiceProtocol {
-    
     func loadImage(from url: URL) async throws -> UIImage {
-        guard let image = UIImage(named: "logo") else {
-            throw URLError(.cannotDecodeContentData)
-        }
-        return image
+        UIImage(named: "logo") ?? UIImage()
     }
 }
 
@@ -61,14 +53,5 @@ final class MockSafariService: SafariServiceProtocol {
     func open(url: URL, in isPresented: Binding<Bool>, selectedURL: Binding<URL?>) {
         selectedURL.wrappedValue = url
         isPresented.wrappedValue = true
-    }
-}
-
-extension DependencyContainer {
-    static var preview: DependencyContainer {
-        DependencyContainer(
-            imageLoaderService: MockImageLoaderService(),
-            safariService: MockSafariService()
-        )
     }
 }

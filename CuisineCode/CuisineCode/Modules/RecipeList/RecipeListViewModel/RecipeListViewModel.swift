@@ -22,8 +22,11 @@ final class RecipeListViewModel: ObservableObject {
     @Published var searchText = ""
     
     private var allRecipes: [Recipe] = []
+    
     private let networkService: NetworkServiceProtocol
-    private let favoriteService: FavoritesServiceProtocol
+    let favoriteService: FavoritesServiceProtocol
+    let imageLoaderService: ImageLoaderServiceProtocol
+    let safariService: SafariServiceProtocol
     
     var isLoaded: Bool {
         if case .loaded = state {
@@ -48,9 +51,11 @@ final class RecipeListViewModel: ObservableObject {
     
     let bannerURL = URL(string: "https://www.fetch.com")
     
-    init(networkService: NetworkServiceProtocol, favoriteService: FavoritesServiceProtocol ) {
+    init(networkService: NetworkServiceProtocol, favoriteService: FavoritesServiceProtocol, imageLoaderService: ImageLoaderServiceProtocol, safariService: SafariServiceProtocol) {
         self.networkService = networkService
         self.favoriteService = favoriteService
+        self.imageLoaderService = imageLoaderService
+        self.safariService = safariService
     }
     
     func loadRecipes() async {
@@ -73,13 +78,5 @@ final class RecipeListViewModel: ObservableObject {
     
     func resetFilter() {
         self.filteredRecipes = allRecipes
-    }
-    
-    func visibleRecipes(showFavorites: Bool) -> [Recipe] {
-        if showFavorites {
-            return filteredRecipes.filter { favoriteService.isFavorite($0.id) }
-        } else {
-            return filteredRecipes
-        }
     }
 }

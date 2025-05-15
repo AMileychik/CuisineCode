@@ -15,17 +15,25 @@ final class DependencyContainer: ObservableObject {
     let safariService: SafariServiceProtocol
     
     init(
-        networkService: NetworkServiceProtocol = NetworkService(),
-        favoritesService: FavoritesServiceProtocol = FavoritesService(),
-        imageLoaderService: ImageLoaderServiceProtocol = ImageLoaderService(),
-        safariService: SafariServiceProtocol = SafariService()
+        networkService: NetworkServiceProtocol,
+        favoritesService: FavoritesServiceProtocol,
+        imageLoaderService: ImageLoaderServiceProtocol,
+        safariService: SafariServiceProtocol
     ) {
         self.networkService = networkService
         self.favoritesService = favoritesService
         self.imageLoaderService = imageLoaderService
         self.safariService = safariService
     }
+    
+    static func makeDefault() -> DependencyContainer {
+        DependencyContainer(
+            networkService: NetworkService(),
+            favoritesService: FavoritesService(),
+            imageLoaderService: ImageLoaderService(),
+            safariService: SafariService()
+        )
+    }
 }
-
 
 

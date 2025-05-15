@@ -15,32 +15,24 @@ struct RecipeListView: View {
     @State private var selectedURL: URL?
     @State private var isShowingWebView: Bool = false
     
+    @StateObject private var viewModel: RecipeListViewModel
     @AppStorage("userName") private var userName: String = ""
     @FocusState private var isNameFieldFocused: Bool
-    @StateObject private var viewModel: RecipeListViewModel
     
-    let favoritesService: FavoritesServiceProtocol
-    let safariService: SafariServiceProtocol
-    let imageLoaderService: ImageLoaderServiceProtocol
+    let viewModelFactory: ViewModelFactory
     let showFavorites: Bool
     
     private var displayedRecipes: [Recipe] {
         viewModel.displayedRecipes.filter {
-            showFavorites == false || favoritesService.isFavorite($0.id) }
+            showFavorites == false || viewModel.favoriteService.isFavorite($0.id) }
     }
     
-    init(container: DependencyContainer, showFavorites: Bool = false) {
-        _viewModel = StateObject(
-            wrappedValue: RecipeListViewModel(
-                networkService: container.networkService,
-                favoriteService: container.favoritesService
-            )
-        )
-        self.favoritesService = container.favoritesService
-        self.safariService = container.safariService
-        self.imageLoaderService = container.imageLoaderService
+    init(viewModel: RecipeListViewModel, viewModelFactory: ViewModelFactory, showFavorites: Bool = false) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+        self.viewModelFactory = viewModelFactory
         self.showFavorites = showFavorites
     }
+    
     
     let columns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 16), count: 2)
     
@@ -64,7 +56,7 @@ struct RecipeListView: View {
                                 if !showFavorites {
                                     FetchBannerView {
                                         if let url = viewModel.bannerURL {
-                                            safariService.open(url: url, in: $isShowingWebView, selectedURL: $selectedURL)
+                                            viewModel.safariService.open(url: url, in: $isShowingWebView, selectedURL: $selectedURL)
                                         }
                                     }
                                     // ——— HEADER ———
@@ -82,17 +74,13 @@ struct RecipeListView: View {
                                 } else {
                                     LazyVGrid(columns: columns, spacing: 16) {
                                         ForEach(displayedRecipes) { recipe in
-                                            NavigationLink(destination:
-                                                            RecipeDetailView(
-                                                                viewModel: .init(
-                                                                    recipe: recipe,
-                                                                    favoritesService: favoritesService,
-                                                                    imageLoaderService: imageLoaderService,
-                                                                    safariService: safariService
-                                                                )
-                                                            )
+                                            NavigationLink(
+                                                destination: RecipeDetailView(
+                                                    viewModel: viewModelFactory.makeRecipeDetailViewModel(for: recipe, favoritesService: viewModel.favoriteService)
+                                                )
+                                                
                                             ) {
-                                                RecipeGrid(recipe: recipe)
+                                                RecipeGrid(recipe: recipe, imageLoaderService: viewModel.imageLoaderService)
                                             }
                                             .buttonStyle(.plain)
                                         }
@@ -141,7 +129,7 @@ struct RecipeListView: View {
             // ——— ONBOARDING VIEW ———
             if showNamePrompt {
                 OnboardingView(
-                    isNameFieldFocused: _isNameFieldFocused, 
+                    isNameFieldFocused: _isNameFieldFocused,
                     tempName: $tempName,
                     showNamePrompt: $showNamePrompt,
                     onSave: { userName = $0 }

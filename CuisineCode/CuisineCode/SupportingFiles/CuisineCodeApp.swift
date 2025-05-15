@@ -9,11 +9,21 @@ import SwiftUI
 
 @main
 struct CuisineCodeApp: App {
-    @StateObject private var container = DependencyContainer()
+    
+    private let viewModelFactory: ViewModelFactory
+    @StateObject private var viewModel: RecipeListViewModel
+    
+    init() {
+        let factory = ViewModelFactory()
+        self.viewModelFactory = factory
+        _viewModel = StateObject(wrappedValue: factory.makeRecipeListViewModel())
+    }
     
     var body: some Scene {
         WindowGroup {
-            ContentView(container: container)
+            ContentView(recipeListViewModel: viewModel)
         }
     }
 }
+
+

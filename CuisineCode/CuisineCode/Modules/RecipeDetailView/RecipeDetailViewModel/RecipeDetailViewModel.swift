@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 final class RecipeDetailViewModel: ObservableObject {
     
     @Published var isFavorite: Bool = false

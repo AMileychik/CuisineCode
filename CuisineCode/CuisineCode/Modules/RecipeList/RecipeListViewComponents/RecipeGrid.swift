@@ -10,12 +10,12 @@ import SwiftUI
 struct RecipeGrid: View {
     
     let recipe: Recipe
-    @Environment(\.dependencyContainer) private var container
+    let imageLoaderService: ImageLoaderServiceProtocol
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             if let photoURL = recipe.photoURLSmall {
-                CachedImageView(url: photoURL, service: container.imageLoaderService)
+                CachedImageView(url: photoURL, service: imageLoaderService)
                     .aspectRatio(1, contentMode: .fill)
                     .clipped()
                     .cornerRadius(8)

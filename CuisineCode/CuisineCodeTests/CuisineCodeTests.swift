@@ -7,6 +7,7 @@
 
 import XCTest
 @testable import CuisineCode
+import SwiftUI
 
 final class RecipeListViewModelTests: XCTestCase {
     
@@ -42,16 +43,32 @@ final class RecipeListViewModelTests: XCTestCase {
         }
     }
     
+    // MARK: - Mock Image Loader Service
+    final class MockImageLoaderService: ImageLoaderServiceProtocol {
+        func loadImage(from url: URL) async throws -> UIImage {
+            return UIImage()
+        }
+    }
+    
+    // MARK: - Mock Safari Service
+    final class MockSafariService: SafariServiceProtocol {
+        func open(url: URL, in binding: Binding<Bool>, selectedURL: Binding<URL?>) {
+            
+        }
+    }
+    
     // MARK: - Successfully loaded recipes
     func testLoadRecipesSuccessUpdatesStateToLoaded() async {
         // Given
         let mockService = MockNetworkService()
         let mockFavorites = MockFavoritesService()
+        let mockImageLoaderService = MockImageLoaderService()
+        let mockSafariService = MockSafariService()
         
         mockService.recipesToReturn = [
             Recipe(id: UUID(), name: "Pizza", cuisine: "Italian", photoURLLarge: nil, photoURLSmall: nil, sourceURL: nil, youtubeURL: nil)
         ]
-        let viewModel = await RecipeListViewModel(networkService: mockService, favoriteService: mockFavorites)
+        let viewModel = await RecipeListViewModel(networkService: mockService, favoriteService: mockFavorites, imageLoaderService: mockImageLoaderService, safariService: mockSafariService)
         
         // When
         await viewModel.loadRecipes()
@@ -73,8 +90,10 @@ final class RecipeListViewModelTests: XCTestCase {
         let mockService = MockNetworkService()
         mockService.shouldReturnError = true
         let mockFavorites = MockFavoritesService()
+        let mockImageLoaderService = MockImageLoaderService()
+        let mockSafariService = MockSafariService()
         
-        let viewModel = await RecipeListViewModel(networkService: mockService, favoriteService: mockFavorites)
+        let viewModel = await RecipeListViewModel(networkService: mockService, favoriteService: mockFavorites, imageLoaderService: mockImageLoaderService, safariService: mockSafariService)
         
         // When
         await viewModel.loadRecipes()
@@ -99,8 +118,10 @@ final class RecipeListViewModelTests: XCTestCase {
         let mockService = MockNetworkService()
         mockService.recipesToReturn = recipes
         let mockFavorites = MockFavoritesService()
+        let mockImageLoaderService = MockImageLoaderService()
+        let mockSafariService = MockSafariService()
         
-        let viewModel = await RecipeListViewModel(networkService: mockService, favoriteService: mockFavorites)
+        let viewModel = await RecipeListViewModel(networkService: mockService, favoriteService: mockFavorites, imageLoaderService: mockImageLoaderService, safariService: mockSafariService)
         
         // When
         await viewModel.loadRecipes()
@@ -125,8 +146,10 @@ final class RecipeListViewModelTests: XCTestCase {
         let mockService = MockNetworkService()
         mockService.recipesToReturn = recipes
         let mockFavorites = MockFavoritesService()
+        let mockImageLoaderService = MockImageLoaderService()
+        let mockSafariService = MockSafariService()
         
-        let viewModel = await RecipeListViewModel(networkService: mockService, favoriteService: mockFavorites)
+        let viewModel = await RecipeListViewModel(networkService: mockService, favoriteService: mockFavorites, imageLoaderService: mockImageLoaderService, safariService: mockSafariService)
         
         await viewModel.loadRecipes()
         
@@ -150,8 +173,10 @@ final class RecipeListViewModelTests: XCTestCase {
         let mockService = MockNetworkService()
         mockService.recipesToReturn = recipes
         let mockFavorites = MockFavoritesService()
+        let mockImageLoaderService = MockImageLoaderService()
+        let mockSafariService = MockSafariService()
         
-        let viewModel = await RecipeListViewModel(networkService: mockService, favoriteService: mockFavorites)
+        let viewModel = await RecipeListViewModel(networkService: mockService, favoriteService: mockFavorites, imageLoaderService: mockImageLoaderService, safariService: mockSafariService)
         
         await viewModel.loadRecipes()
         await viewModel.filterByCuisine("Italian")
@@ -180,8 +205,10 @@ final class RecipeListViewModelTests: XCTestCase {
         let mockService = MockNetworkService()
         mockService.recipesToReturn = recipes
         let mockFavorites = MockFavoritesService()
+        let mockImageLoaderService = MockImageLoaderService()
+        let mockSafariService = MockSafariService()
         
-        let viewModel = await RecipeListViewModel(networkService: mockService, favoriteService: mockFavorites)
+        let viewModel = await RecipeListViewModel(networkService: mockService, favoriteService: mockFavorites, imageLoaderService: mockImageLoaderService, safariService: mockSafariService)
         
         // When
         await viewModel.loadRecipes()
@@ -197,8 +224,10 @@ final class RecipeListViewModelTests: XCTestCase {
         // Given
         let mockService = MockNetworkService()
         let mockFavorites = MockFavoritesService()
+        let mockImageLoaderService = MockImageLoaderService()
+        let mockSafariService = MockSafariService()
         
-        let viewModel = await RecipeListViewModel(networkService: mockService, favoriteService: mockFavorites)
+        let viewModel = await RecipeListViewModel(networkService: mockService, favoriteService: mockFavorites, imageLoaderService: mockImageLoaderService, safariService: mockSafariService)
         
         // Then
         await MainActor.run {
@@ -217,8 +246,10 @@ final class RecipeListViewModelTests: XCTestCase {
         let recipe = Recipe(id: UUID(), name: "Burger", cuisine: "American", photoURLLarge: nil, photoURLSmall: nil, sourceURL: nil, youtubeURL: nil)
         mockService.recipesToReturn = [recipe]
         let mockFavorites = MockFavoritesService()
+        let mockImageLoaderService = MockImageLoaderService()
+        let mockSafariService = MockSafariService()
         
-        let viewModel = await RecipeListViewModel(networkService: mockService, favoriteService: mockFavorites)
+        let viewModel = await RecipeListViewModel(networkService: mockService, favoriteService: mockFavorites, imageLoaderService: mockImageLoaderService, safariService: mockSafariService)
         
         // When
         await viewModel.loadRecipes()
@@ -241,8 +272,10 @@ final class RecipeListViewModelTests: XCTestCase {
         let mockService = MockNetworkService()
         mockService.recipesToReturn = []
         let mockFavorites = MockFavoritesService()
+        let mockImageLoaderService = MockImageLoaderService()
+        let mockSafariService = MockSafariService()
         
-        let viewModel = await RecipeListViewModel(networkService: mockService, favoriteService: mockFavorites)
+        let viewModel = await RecipeListViewModel(networkService: mockService, favoriteService: mockFavorites, imageLoaderService: mockImageLoaderService, safariService: mockSafariService)
         
         // When
         await viewModel.loadRecipes()
