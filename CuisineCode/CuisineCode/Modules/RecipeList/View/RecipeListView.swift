@@ -2,140 +2,122 @@
 //  RecipeListView.swift
 //  CuisineCode
 //
-//  Created by Alexander Mileychik  on 4/29/25.
+//  Created by Alexander Mileychik on 4/29/25.
 //
 
 import SwiftUI
 
 struct RecipeListView: View {
     
-    @State private var searchText: String = ""
-    @State private var tempName: String = ""
-    @State private var showNamePrompt: Bool = false
-    @State private var selectedURL: URL?
-    @State private var isShowingWebView: Bool = false
-    
-    @StateObject private var viewModel: RecipeListViewModel
-    @AppStorage("userName") private var userName: String = ""
-    @FocusState private var isNameFieldFocused: Bool
-    
+    // MARK: - Dependencies
     let viewModelFactory: ViewModelFactory
     let showFavorites: Bool
     
-    private var displayedRecipes: [Recipe] {
-        viewModel.displayedRecipes.filter {
-            showFavorites == false || viewModel.favoriteService.isFavorite($0.id) }
-    }
+    // MARK: - State
+    @State private var selectedURL: URL?
+    @State private var isShowingWebView: Bool = false
+    @State private var tempName: String = ""
+    @State private var showNamePrompt: Bool = false
+    @FocusState private var isNameFieldFocused: Bool
+
+    // MARK: - Storage
+    @AppStorage("userName") private var userName: String = ""
     
-    init(viewModel: RecipeListViewModel, viewModelFactory: ViewModelFactory, showFavorites: Bool = false) {
+    // MARK: - ViewModel
+    @StateObject private var viewModel: RecipeListViewModel
+    
+    // MARK: - Init
+    init(
+        viewModel: RecipeListViewModel,
+        viewModelFactory: ViewModelFactory,
+        showFavorites: Bool = false
+    ) {
         _viewModel = StateObject(wrappedValue: viewModel)
         self.viewModelFactory = viewModelFactory
         self.showFavorites = showFavorites
     }
     
+    // MARK: - Computed Properties
+    private var displayedRecipes: [Recipe] {
+        showFavorites
+        ? viewModel.displayedRecipes.filter { viewModel.favoritesService.isFavorite($0.id) }
+        : viewModel.displayedRecipes
+    }
     
-    let columns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 16), count: 2)
-    
+    // MARK: - Body
     var body: some View {
         ZStack {
-            NavigationStack {
-                VStack {
-                    switch viewModel.state {
-                    case .initial, .loading:
-                        ProgressView(Texts.RecipeListView.progressViewState)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        
-                    case .error(let message):
-                        Text("Error: \(message)")
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        
-                    case .loaded:
-                        ScrollView {
-                            VStack(spacing: 16) {
-                                // ——— FETCH BANNER ———
-                                if !showFavorites {
-                                    FetchBannerView {
-                                        if let url = viewModel.bannerURL {
-                                            viewModel.safariService.open(url: url, in: $isShowingWebView, selectedURL: $selectedURL)
-                                        }
-                                    }
-                                    // ——— HEADER ———
-                                    HeaderView(text: Texts.RecipeListView.recipeHeader)
-                                }
-                                // ——— ANIMATED FAVORITE HEADER ———
-                                if showFavorites {
-                                    AnimatedFavoriteHeader(title: Texts.RecipeListView.favoriteRecipesHeader)
-                                }
-                                // ——— RECIPE GRID ———
-                                if displayedRecipes.isEmpty {
-                                    Text(Texts.RecipeListView.emptyFavoritesList)
-                                        .foregroundColor(.secondary)
-                                        .padding()
-                                } else {
-                                    LazyVGrid(columns: columns, spacing: 16) {
-                                        ForEach(displayedRecipes) { recipe in
-                                            NavigationLink(
-                                                destination: RecipeDetailView(
-                                                    viewModel: viewModelFactory.makeRecipeDetailViewModel(for: recipe, favoritesService: viewModel.favoriteService)
-                                                )
-                                                
-                                            ) {
-                                                RecipeGrid(recipe: recipe, imageLoaderService: viewModel.imageLoaderService)
-                                            }
-                                            .buttonStyle(.plain)
-                                        }
-                                    }
-                                    .padding()
-                                }
-                            }
-                        }
-                        .refreshable {
-                            await viewModel.loadRecipes()
-                        }
-                    }
-                }
-                .navigationBarTitleDisplayMode(.inline)
-                .whiteNavigationBar()
-                // ——— TOOLBAR ITEMS ———
-                .toolbar {
-                    RecipeToolbar(
-                        userName: userName,
-                        cuisines: viewModel.uniqueCuisines,
-                        onFilter: { viewModel.filterByCuisine($0) },
-                        onReset: { viewModel.resetFilter() }
-                    )
-                }
-                .searchable(text: $viewModel.searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: Texts.RecipeListView.searchRecipes)
-                .task(id: isShowingWebView) {
-                    if !isShowingWebView && !viewModel.isLoaded {
-                        await viewModel.loadRecipes()
-                    }
-                }
-                .onAppear {
-                    Task {
-                        await viewModel.loadRecipes()
-                    }
-                    // ——— ONBOARDING CHECK ———
-                    if userName.isEmpty {
-                        showNamePrompt = true
-                    }
-                }
-                .sheet(isPresented: $isShowingWebView) {
-                    if let url = selectedURL {
-                        SafariView(url: url)
-                    }
-                }
-            }
-            // ——— ONBOARDING VIEW ———
+            recipeListContent
             if showNamePrompt {
-                OnboardingView(
-                    isNameFieldFocused: _isNameFieldFocused,
-                    tempName: $tempName,
-                    showNamePrompt: $showNamePrompt,
-                    onSave: { userName = $0 }
-                )
+                onboardingPrompt
             }
         }
     }
-}
+    
+    // MARK: - Main Content
+    private var recipeListContent: some View {
+        NavigationStack {
+            RecipeListContentView(
+                showFavorites: showFavorites,
+                displayedRecipes: displayedRecipes,
+                bannerURL: URLs.banner ,
+                imageLoaderService: viewModel.imageLoaderService,
+                favoritesService: viewModel.favoritesService,
+                viewModelFactory: viewModelFactory,
+                onBannerTap: {
+                    viewModel.safariService.open(url: URLs.banner, in: $isShowingWebView, selectedURL: $selectedURL)
+                },
+                onRefresh: {
+                    await viewModel.loadRecipes()
+                },
+                state: viewModel.state
+            )
+            .navigationBarTitleDisplayMode(.inline)
+            .whiteNavigationBar()
+            .toolbar { toolbarItems }
+            .searchable(
+                text: $viewModel.searchText,
+                placement: .navigationBarDrawer(displayMode: .always),
+                prompt: Texts.RecipeListView.searchRecipes
+            )
+            .task(id: isShowingWebView) {
+                if !isShowingWebView && !viewModel.isLoaded {
+                    await viewModel.loadRecipes()
+                }
+            }
+            .onAppear {
+                Task {
+                    await viewModel.loadRecipes()
+                }
+                if userName.isEmpty {
+                    showNamePrompt = true
+                }
+            }
+            .sheet(isPresented: $isShowingWebView) {
+                if let url = selectedURL {
+                    SafariView(url: url)
+                }
+            }
+        }
+    }
+    
+    // MARK: - Onboarding Prompt
+    private var onboardingPrompt: some View {
+        OnboardingPromptView(
+            isNameFieldFocused: _isNameFieldFocused,
+            tempName: $tempName,
+            showNamePrompt: $showNamePrompt,
+            onSave: { userName = $0 }
+        )
+    }
 
+    // MARK: - Toolbar
+    private var toolbarItems: some ToolbarContent {
+        RecipeToolbar(
+            userName: userName,
+            cuisines: viewModel.uniqueCuisines,
+            onFilter: { viewModel.filterByCuisine($0) },
+            onReset: { viewModel.resetFilter() }
+        )
+    }
+}

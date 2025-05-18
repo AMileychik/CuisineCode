@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct OnboardingView: View {
+struct OnboardingPromptView: View {
     
     @FocusState var isNameFieldFocused: Bool
     @Binding var tempName: String
@@ -32,20 +32,7 @@ struct OnboardingView: View {
                 .fontWeight(.bold)
                 .multilineTextAlignment(.center)
             
-            ZStack(alignment: .trailing) {
-                TextField(Texts.RecipeListView.userNameInput, text: $tempName)
-                    .textFieldStyle(.roundedBorder)
-                    .focused($isNameFieldFocused)
-                    .padding(.horizontal)
-                
-                if !tempName.isEmpty {
-                    Button(action: { tempName = "" }) {
-                        Image(systemName: Images.xCircleFill)
-                            .foregroundColor(.gray)
-                            .padding(.trailing, 8)
-                    }
-                }
-            }
+            OnboardingTextField(text: $tempName, isFocused: _isNameFieldFocused)
             
             HStack {
                 Button(Texts.RecipeListView.cancel) { showNamePrompt = false }
@@ -74,25 +61,3 @@ struct OnboardingView: View {
     }
 }
 
-struct OnboardingTextField: View {
-    
-    @Binding var text: String
-    @FocusState var isFocused: Bool
-    
-    var body: some View {
-        ZStack(alignment: .trailing) {
-            TextField(Texts.RecipeListView.userNameInput, text: $text)
-                .textFieldStyle(.roundedBorder)
-                .focused($isFocused)
-                .padding(.horizontal)
-            
-            if !text.isEmpty {
-                Button(action: { text = "" }) {
-                    Image(systemName: Images.xCircleFill)
-                        .foregroundColor(.gray)
-                        .padding(.trailing, 8)
-                }
-            }
-        }
-    }
-}

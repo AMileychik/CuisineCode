@@ -1,5 +1,5 @@
 //
-//  AppFactory.swift
+//  ViewModelFactory.swift
 //  CuisineCode
 //
 //  Created by Alexander Mileychik on 5/14/25.
@@ -10,21 +10,21 @@ import SwiftUI
 @MainActor
 final class ViewModelFactory {
     
-    private let container: DependencyContainer
-
-    init(container: DependencyContainer = .makeDefault()) {
+    private let container: DependencyContainerProtocol
+    
+    init(container: DependencyContainerProtocol = DependencyContainer.makeDefault()) {
         self.container = container
     }
-
+    
     func makeRecipeListViewModel() -> RecipeListViewModel {
         RecipeListViewModel(
             networkService: container.networkService,
-            favoriteService: container.favoritesService,
+            favoritesService: container.favoritesService,
             imageLoaderService: container.imageLoaderService,
             safariService: container.safariService
         )
     }
-
+    
     func makeRecipeDetailViewModel(for recipe: Recipe, favoritesService: FavoritesServiceProtocol) -> RecipeDetailViewModel {
         RecipeDetailViewModel(
             recipe: recipe,

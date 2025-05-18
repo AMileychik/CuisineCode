@@ -14,10 +14,9 @@ struct Partner: Identifiable {
 }
 
 extension Partner {
-    
     static let partners: [Partner] = [
-        .init(imageName: "Target", url: URL(string: "https://www.target.com")),
-        .init(imageName: "UberEat", url: URL(string: "https://www.ubereats.com")),
-        .init(imageName: "Walmart", url: URL(string: "https://www.walmart.com"))
+        .init(imageName: "Target", url: URLs.target),
+        .init(imageName: "UberEat", url: URLs.uberEat),
+        .init(imageName: "Walmart", url: URLs.walmart)
     ]
 }
