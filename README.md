@@ -3,8 +3,8 @@
 ### Summary
 
 **CuisineCode** is an iOS application for discovering, viewing, and saving recipes, with support for opening external links.  
-At launch, users enter their name to personalize the interface.  
-The app is built on the MVVM architecture using `async/await`, dependency injection (DI), and local caching.  
+On first launch, users are prompted to enter their name to personalize the experience. 
+The app is built on the MVVM architecture using `async/await`, dependency injection, and local caching.  
 The project follows clean architecture principles with a focus on modularity, testability, and user experience (UX).
 
 ---
@@ -41,10 +41,10 @@ The project follows clean architecture principles with a focus on modularity, te
 
 Main development priorities:
 - Clean architecture emphasizing scalability and testability  
-- Clear separation of concerns with MVVM layers and DI via `EnvironmentKey`  
+- Clear separation of concerns with MVVM layers and DI via `DependencyContainer`, `ViewModelFactory` and `ScreenFactory` 
 - Modern UI/UX with minimalist design, animations, and state adaptation (`@StateObject`, `@AppStorage`)  
 - Performance: Custom `ImageLoaderService` with caching via `FileManager`  
-- Modular approach: each feature is encapsulated in a separate component  
+- Modular approach: each feature is encapsulated in a separate component
 
 ---
 
@@ -79,27 +79,36 @@ Uses `Binding<Bool>` and `Binding<URL?>` for controlled modal presentation.
 
 ---
 
+Dependency Management
+- All services are injected via `DependencyContainer`, conforming to `DependencyContainerProtocol`
+- `DependencyContainer` holds services (`NetworkService`, `FavoritesService`, etc.)
+- `ViewModelFactory` creates ViewModels for screens
+- `ScreenFactory` builds views and injects dependencies
+- Supports preview mode with mock services via `makePreview()`
+
+---
+
 ### Time Spent
 
 | Stage                       | Hours  |
 |-----------------------------|--------|
-| Architecture + DI           | 6 h    |
-| RecipeList + filtering      | 8 h    |
+| Architecture + DI           | 8 h    |
+| RecipeList + filtering      | 10 h    |
 | RecipeDetail + Safari       | 6 h    |
 | Image caching               | 3 h    |
-| Favorites + `@AppStorage`   | 2 h    |
+| Favorites + `@AppStorage`   | 3 h    |
 | Unit tests                  | 3 h    |
 | README                      | 2 h    |
 
-**Total — approx. 30 hours**
+**Total — approx. 35 hours**
 
 ---
 
 ### Trade-offs and Decisions
 
-- Using Dependency Injection (DI) via EnvironmentKey — a solution that simplifies access to services in different parts of the app but requires additional effort for setup and testing. It provides flexibility in changing dependencies, but also increases the complexity of understanding the architecture.
+- Using Dependency Injection (DI) via DependencyContainer, ViewModelFactory and ScreenFactory — a centralized and explicit way to manage dependencies. It improves testability and modularity by allowing easy service replacement and mocking. However, it introduces additional boilerplate and may slightly increase architectural complexity, especially in smaller projects.
 
--  Using MVVM architecture — improves separation of concerns by keeping UI logic in the ViewModel, making the codebase more testable and maintainable. However, in SwiftUI, ViewModels can sometimes grow too large if not carefully structured, and binding complex UI states may introduce boilerplate or lead to tight coupling between Views and ViewModels.
+- Using MVVM architecture — improves separation of concerns by keeping UI logic in the ViewModel, making the codebase more testable and maintainable. However, in SwiftUI, ViewModels can sometimes grow too large if not carefully structured, and binding complex UI states may introduce boilerplate or lead to tight coupling between Views and ViewModels.
 
 - Separating image loading and caching logic into a dedicated service (ImageLoaderService) enhances reusability and testability, but increases coupling by manually passing dependencies into each View/Model.
 
@@ -122,9 +131,10 @@ Uses `Binding<Bool>` and `Binding<URL?>` for controlled modal presentation.
 The architecture is designed with scalability in mind and easy integration of additional features, such as:
 - User profile support
 - Favorites synchronization with the server
-- Centralized and testable dependency management using EnvironmentKey
 - Image caching for improved performance
 - Easy service replacement during testing through protocols
+- DI setup allows easy integration of new services and features without changing existing code
+- Clear boundary between infrastructure and business logic
 
 ---
 

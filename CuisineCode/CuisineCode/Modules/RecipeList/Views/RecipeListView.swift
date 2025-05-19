@@ -19,7 +19,7 @@ struct RecipeListView: View {
     @State private var tempName: String = ""
     @State private var showNamePrompt: Bool = false
     @FocusState private var isNameFieldFocused: Bool
-
+    
     // MARK: - Storage
     @AppStorage("userName") private var userName: String = ""
     
@@ -40,7 +40,7 @@ struct RecipeListView: View {
     // MARK: - Computed Properties
     private var displayedRecipes: [Recipe] {
         showFavorites
-        ? viewModel.displayedRecipes.filter { viewModel.favoritesService.isFavorite($0.id) }
+        ? viewModel.displayedRecipes.filter { viewModel.isFavorite($0.id) }
         : viewModel.displayedRecipes
     }
     
@@ -57,21 +57,13 @@ struct RecipeListView: View {
     // MARK: - Main Content
     private var recipeListContent: some View {
         NavigationStack {
-            RecipeListContentView(
-                showFavorites: showFavorites,
-                displayedRecipes: displayedRecipes,
-                bannerURL: URLs.banner ,
-                imageLoaderService: viewModel.imageLoaderService,
-                favoritesService: viewModel.favoritesService,
-                viewModelFactory: viewModelFactory,
-                onBannerTap: {
-                    viewModel.safariService.open(url: URLs.banner, in: $isShowingWebView, selectedURL: $selectedURL)
-                },
-                onRefresh: {
-                    await viewModel.loadRecipes()
-                },
-                state: viewModel.state
-            )
+            RecipeListContentView(showFavorites: showFavorites, 
+                                  displayedRecipes: displayedRecipes,
+                                  bannerURL: URLs.banner,
+                                  viewModelFactory: viewModelFactory,
+                                  onBannerTap: { viewModel.openInSafari(URLs.banner, in: $isShowingWebView, selectedURL: $selectedURL) },
+                                  onRefresh: { await viewModel.loadRecipes() },
+                                  viewModel: viewModel)
             .navigationBarTitleDisplayMode(.inline)
             .whiteNavigationBar()
             .toolbar { toolbarItems }
@@ -110,7 +102,7 @@ struct RecipeListView: View {
             onSave: { userName = $0 }
         )
     }
-
+    
     // MARK: - Toolbar
     private var toolbarItems: some ToolbarContent {
         RecipeToolbar(

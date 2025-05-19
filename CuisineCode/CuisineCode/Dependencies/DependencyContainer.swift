@@ -14,7 +14,7 @@ protocol DependencyContainerProtocol {
     var safariService: SafariServiceProtocol { get }
 }
 
-final class DependencyContainer: ObservableObject, DependencyContainerProtocol {
+final class DependencyContainer: DependencyContainerProtocol {
     
     let networkService: NetworkServiceProtocol
     let favoritesService: FavoritesServiceProtocol

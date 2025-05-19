@@ -5,7 +5,7 @@
 //  Created by Alexander Mileychik on 4/29/25.
 //
 
-import Foundation
+import SwiftUI
 
 @MainActor
 final class RecipeListViewModel: ObservableObject {
@@ -17,9 +17,9 @@ final class RecipeListViewModel: ObservableObject {
 
     // MARK: - Dependencies
     private let networkService: NetworkServiceProtocol
-    let favoritesService: FavoritesServiceProtocol
+    private let favoritesService: FavoritesServiceProtocol
+    private let safariService: SafariServiceProtocol
     let imageLoaderService: ImageLoaderServiceProtocol
-    let safariService: SafariServiceProtocol
 
     // MARK: - Internal Data
     private var allRecipes: [Recipe] = []
@@ -28,6 +28,14 @@ final class RecipeListViewModel: ObservableObject {
     var isLoaded: Bool {
         if case .loaded = state { return true }
         return false
+    }
+    
+    func isFavorite(_ id: UUID) -> Bool {
+        favoritesService.isFavorite(id)
+    }
+    
+    func openInSafari(_ url: URL, in isPresented: Binding<Bool>, selectedURL: Binding<URL?>) {
+        safariService.open(url: url, in: isPresented, selectedURL: selectedURL)
     }
 
     var displayedRecipes: [Recipe] {

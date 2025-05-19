@@ -25,10 +25,10 @@ final class ViewModelFactory {
         )
     }
     
-    func makeRecipeDetailViewModel(for recipe: Recipe, favoritesService: FavoritesServiceProtocol) -> RecipeDetailViewModel {
+    func makeRecipeDetailViewModel(for recipe: Recipe) -> RecipeDetailViewModel {
         RecipeDetailViewModel(
             recipe: recipe,
-            favoritesService: favoritesService,
+            favoritesService: container.favoritesService,
             imageLoaderService: container.imageLoaderService,
             safariService: container.safariService
         )
