@@ -11,7 +11,7 @@ protocol ImageLoaderServiceProtocol {
     func loadImage(from url: URL) async throws -> UIImage
 }
 
-final class ImageLoaderService: ImageLoaderServiceProtocol {
+final class ImageLoaderService: ObservableObject, ImageLoaderServiceProtocol {
     
     private let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
     
@@ -68,20 +68,28 @@ final class ImageLoader: ObservableObject {
 }
 
 struct CachedImageView: View {
-    @StateObject private var loader: ImageLoader
-    private let url: URL
-    private let service: ImageLoaderServiceProtocol
-    
-    init(url: URL, service: ImageLoaderServiceProtocol) {
-        self._loader = StateObject(wrappedValue: ImageLoader(url: url, service: service))
-        self.url = url
-        self.service = service
+    let url: URL
+    @Environment(\.imageLoaderService) private var service
+
+    var body: some View {
+        CachedImageViewImpl(loader: ImageLoader(url: url, service: service))
     }
+}
+
+private struct CachedImageViewImpl: View {
     
+    @StateObject private var loader: ImageLoader
+
+    init(loader: ImageLoader) {
+        _loader = StateObject(wrappedValue: loader)
+    }
+
     var body: some View {
         Group {
             if let image = loader.image {
-                Image(uiImage: image).resizable()
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
             } else {
                 ProgressView()
             }
@@ -92,4 +100,14 @@ struct CachedImageView: View {
     }
 }
 
+private struct ImageLoaderServiceKey: EnvironmentKey {
+    static let defaultValue: ImageLoaderServiceProtocol = ImageLoaderService()
+}
+
+extension EnvironmentValues {
+    var imageLoaderService: ImageLoaderServiceProtocol {
+        get { self[ImageLoaderServiceKey.self] }
+        set { self[ImageLoaderServiceKey.self] = newValue }
+    }
+}
 

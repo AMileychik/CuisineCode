@@ -17,8 +17,7 @@ struct RecipeDetailView_Previews: PreviewProvider {
         let viewModel = RecipeDetailViewModel(
             recipe: .mock,
             favoritesService: mockFavoritesService,
-            imageLoaderService: PreviewMockImageLoaderService(),
-            safariService: PreviewMockSafariService()
+            imageLoaderService: PreviewMockImageLoaderService()
         )
         
         viewModel.isDataLoaded = true

@@ -13,13 +13,14 @@ final class RecipeListViewModel: ObservableObject {
     // MARK: - Published Properties
     @Published var state: RecipeListState = .initial
     @Published var filteredRecipes: [Recipe] = []
+    @Published var favoriteIDs: Set<UUID> = []
     @Published var searchText = ""
+    @Published var selectedURL: URL? = nil
 
     // MARK: - Dependencies
     private let networkService: NetworkServiceProtocol
     private let favoritesService: FavoritesServiceProtocol
-    private let safariService: SafariServiceProtocol
-    let imageLoaderService: ImageLoaderServiceProtocol
+    private let imageLoaderService: ImageLoaderServiceProtocol
 
     // MARK: - Internal Data
     private var allRecipes: [Recipe] = []
@@ -28,14 +29,6 @@ final class RecipeListViewModel: ObservableObject {
     var isLoaded: Bool {
         if case .loaded = state { return true }
         return false
-    }
-    
-    func isFavorite(_ id: UUID) -> Bool {
-        favoritesService.isFavorite(id)
-    }
-    
-    func openInSafari(_ url: URL, in isPresented: Binding<Bool>, selectedURL: Binding<URL?>) {
-        safariService.open(url: url, in: isPresented, selectedURL: selectedURL)
     }
 
     var displayedRecipes: [Recipe] {
@@ -57,13 +50,11 @@ final class RecipeListViewModel: ObservableObject {
     init(
         networkService: NetworkServiceProtocol,
         favoritesService: FavoritesServiceProtocol,
-        imageLoaderService: ImageLoaderServiceProtocol,
-        safariService: SafariServiceProtocol
+        imageLoaderService: ImageLoaderServiceProtocol
     ) {
         self.networkService = networkService
         self.favoritesService = favoritesService
         self.imageLoaderService = imageLoaderService
-        self.safariService = safariService
     }
 
     // MARK: - Actions
@@ -72,10 +63,12 @@ final class RecipeListViewModel: ObservableObject {
 
         do {
             let recipes = try await networkService.loadRecipes()
+            if Task.isCancelled { return }
             allRecipes = recipes.recipes
             filteredRecipes = recipes.recipes
             state = .loaded(recipes.recipes)
         } catch {
+            if Task.isCancelled { return }
             state = .error(error.localizedDescription)
         }
     }
@@ -87,4 +80,17 @@ final class RecipeListViewModel: ObservableObject {
     func resetFilter() {
         filteredRecipes = allRecipes
     }
+
+    func updateFavorites() {
+        favoriteIDs = favoritesService.fetchFavoriteIDs()
+    }
+
+    func isFavorite(_ id: UUID) -> Bool {
+        favoritesService.isFavorite(id)
+    }
+
+    func openInSafari(_ url: URL) {
+        selectedURL = url
+    }
 }
+

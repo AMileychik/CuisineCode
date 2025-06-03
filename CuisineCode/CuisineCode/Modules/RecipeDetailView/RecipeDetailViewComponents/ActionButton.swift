@@ -9,20 +9,12 @@ import SwiftUI
 
 struct ActionButton: View {
     
-    @Binding var isShowingWebView: Bool
-    @Binding var selectedURL: URL?
-    
-    let safariService: SafariServiceProtocol
     let title: String
     let gradient: [Color]
-    let url: URL?
-
+    let onTap: () -> Void
+    
     var body: some View {
-        Button {
-            if let url = url {
-                safariService.open(url: url, in: $isShowingWebView, selectedURL: $selectedURL)
-            }
-        } label: {
+        Button(action: onTap) {
             Text(title)
                 .font(.headline)
                 .foregroundColor(.white)

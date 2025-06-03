@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct RecipeInfoView: View {
+  
     let name: String
     let cuisine: String
     let isFavorite: Bool

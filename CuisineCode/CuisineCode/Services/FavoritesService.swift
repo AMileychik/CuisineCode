@@ -9,14 +9,17 @@ import SwiftUI
 
 protocol FavoritesServiceProtocol {
     var favoriteIDs: Set<String> { get }
+    
     func isFavorite(_ id: UUID) -> Bool
     func toggleFavorite(_ id: UUID)
+    func fetchFavoriteIDs() -> Set<UUID>
 }
 
 final class FavoritesService: ObservableObject, FavoritesServiceProtocol {
     
     @AppStorage("favoriteRecipeIDs") private var favoriteIDsData: Data = Data()
     @Published private(set) var favoriteIDs: Set<String> = []
+    private var favorites: Set<UUID> = []
     
     init() {
         load()
@@ -47,6 +50,9 @@ final class FavoritesService: ObservableObject, FavoritesServiceProtocol {
         }
         save()
     }
+    
+    func fetchFavoriteIDs() -> Set<UUID> {
+        Set(favoriteIDs.compactMap { UUID(uuidString: $0) })
+    }
 }
-
 

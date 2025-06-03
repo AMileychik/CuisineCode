@@ -9,12 +9,8 @@ import SwiftUI
 
 struct FetchPartnersPromoView: View {
     
-    @Environment(\.openURL) private var openURL
-    @State private var isShowingWebView: Bool = false
-    @State private var selectedURL: URL?
-    
     let partners: [Partner]
-    let safariService: SafariServiceProtocol
+    var onTap: (URL?) -> Void
     
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -39,9 +35,7 @@ struct FetchPartnersPromoView: View {
                 HStack(spacing: 12) {
                     ForEach(partners) { partner in
                         Button {
-                            if let url = partner.url {
-                                safariService.open(url: url, in: $isShowingWebView, selectedURL: $selectedURL)
-                            }
+                            onTap(partner.url)
                         } label: {
                             if let imageName = partner.imageName {
                                 Image(imageName)
@@ -63,10 +57,5 @@ struct FetchPartnersPromoView: View {
         }
         .padding(.vertical, 16)
         .background(Color.gray.opacity(0.1))
-        .sheet(isPresented: $isShowingWebView) {
-            if let url = selectedURL {
-                SafariView(url: url)
-            }
-        }
     }
 }

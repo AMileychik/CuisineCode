@@ -11,19 +11,24 @@ struct RecipeListView_Previews: PreviewProvider {
     static var previews: some View {
         
         let container = DependencyContainer.makePreview()
-        let factory = ViewModelFactory(container: container)
+        let viewModelFactory = ViewModelFactory(container: container)
+        let screenFactory = ScreenFactory(viewModelFactory: viewModelFactory)
 
         return Group {
+            
             RecipeListView(
-                viewModel: factory.makeRecipeListViewModel(),
-                viewModelFactory: factory,
+                viewModel: viewModelFactory.makeRecipeListViewModel(),
+                screenFactory: screenFactory,
                 showFavorites: false
             )
+            .environment(\.imageLoaderService, container.imageLoaderService)
+            
             RecipeListView(
-                viewModel: factory.makeRecipeListViewModel(),
-                viewModelFactory: factory,
+                viewModel: viewModelFactory.makeRecipeListViewModel(),
+                screenFactory: screenFactory,
                 showFavorites: true
             )
+            .environment(\.imageLoaderService, container.imageLoaderService)
         }
     }
 }

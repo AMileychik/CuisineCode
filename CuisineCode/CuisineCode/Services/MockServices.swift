@@ -14,25 +14,7 @@ final class PreviewMockNetworkService: NetworkServiceProtocol {
     
     func loadRecipes() async throws -> RecipeResponse {
         let recipes: [Recipe] = [
-            .mock,
-            Recipe(
-                id: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!,
-                name: "Sushi Roll",
-                cuisine: "Japanese",
-                photoURLLarge: URL(string: "https://example.com/large-sushi.jpg"),
-                photoURLSmall: URL(string: "https://example.com/small-sushi.jpg"),
-                sourceURL: URL(string: "https://example.com/sushi-recipe"),
-                youtubeURL: URL(string: "https://youtube.com/sushi")
-            ),
-            Recipe(
-                id: UUID(uuidString: "22222222-2222-2222-2222-222222222222")!,
-                name: "Tacos",
-                cuisine: "Mexican",
-                photoURLLarge: URL(string: "https://example.com/large-tacos.jpg"),
-                photoURLSmall: URL(string: "https://example.com/small-tacos.jpg"),
-                sourceURL: URL(string: "https://example.com/tacos-recipe"),
-                youtubeURL: URL(string: "https://youtube.com/tacos")
-            )
+            .mock
         ]
         
         return RecipeResponse(recipes: recipes)
@@ -41,6 +23,7 @@ final class PreviewMockNetworkService: NetworkServiceProtocol {
 
 // MARK: - PreviewMockFavoritesService
 final class PreviewMockFavoritesService: FavoritesServiceProtocol {
+       
     private let networkService: NetworkServiceProtocol
     var favoriteIDs: Set<String> = []
     
@@ -69,13 +52,9 @@ final class PreviewMockFavoritesService: FavoritesServiceProtocol {
             favoriteIDs.insert(idString)
         }
     }
-}
-
-// MARK: - PreviewMockSafariService
-final class PreviewMockSafariService: SafariServiceProtocol {
-    func open(url: URL, in isPresented: Binding<Bool>, selectedURL: Binding<URL?>) {
-        selectedURL.wrappedValue = url
-        isPresented.wrappedValue = true
+    
+    func fetchFavoriteIDs() -> Set<UUID> {
+        Set(favoriteIDs.compactMap {UUID(uuidString: $0)})
     }
 }
 
@@ -103,6 +82,7 @@ final class TestMockNetworkService: NetworkServiceProtocol {
 
 // MARK: - TestMockFavoritesService
 final class TestMockFavoritesService: FavoritesServiceProtocol {
+    
     var favoriteIDs: Set<String> = []
     
     func isFavorite(_ id: UUID) -> Bool {
@@ -117,12 +97,9 @@ final class TestMockFavoritesService: FavoritesServiceProtocol {
             favoriteIDs.insert(idString)
         }
     }
-}
-
-// MARK: - TestMockSafariService
-final class TestMockSafariService: SafariServiceProtocol {
-    func open(url: URL, in binding: Binding<Bool>, selectedURL: Binding<URL?>) {
-        
+    
+    func fetchFavoriteIDs() -> Set<UUID> {
+        Set(favoriteIDs.compactMap {UUID(uuidString: $0)})
     }
 }
 

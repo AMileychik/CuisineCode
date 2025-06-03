@@ -13,14 +13,12 @@ final class RecipeListViewModelTests: XCTestCase {
     
     private lazy var favoritesService = TestMockFavoritesService()
     private lazy var imageLoaderService = TestMockImageLoaderService()
-    private lazy var safariService = PreviewMockSafariService()
     
     private func makeViewModel(with networkService: TestMockNetworkService) async -> RecipeListViewModel {
         await RecipeListViewModel(
             networkService: networkService,
             favoritesService: favoritesService,
-            imageLoaderService: imageLoaderService,
-            safariService: safariService
+            imageLoaderService: imageLoaderService
         )
     }
     

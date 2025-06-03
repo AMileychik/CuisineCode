@@ -9,32 +9,25 @@ import SwiftUI
 
 struct RecipeDetailView: View {
     
-    // MARK: - State
-    @StateObject var viewModel: RecipeDetailViewModel
-    @State private var isShowingWebView: Bool = false
-    @State private var selectedURL: URL?
+    @StateObject private var viewModel: RecipeDetailViewModel
     
-    // MARK: - Init
     init(viewModel: RecipeDetailViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
     
-    // MARK: - Body
     var body: some View {
-        recipeDetailContent
+        recipeListContent
     }
     
-    private var recipeDetailContent: some View {
+    // MARK: - Main Content Layer
+    private var recipeListContent: some View {
         RecipeDetailContentView(
-            viewModel: viewModel,
-            isShowingWebView: $isShowingWebView,
-            selectedURL: $selectedURL
+            viewModel: viewModel
         )
         .navigationBarTitleDisplayMode(.inline)
-        .sheet(item: $selectedURL) { SafariView(url: $0) }
-        .task { await viewModel.loadData() }
+        .sheet(item: $viewModel.selectedURL) { SafariView(url: $0) }
+        .task {
+            await viewModel.loadData()
+        }
     }
 }
-
-
-

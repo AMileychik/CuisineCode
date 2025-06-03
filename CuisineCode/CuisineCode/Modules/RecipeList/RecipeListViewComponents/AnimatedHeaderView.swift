@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct AnimatedFavoriteHeader: View {
-    let title: String
+    
     @State private var show = false
+    let title: String
     
     var body: some View {
         ZStack {

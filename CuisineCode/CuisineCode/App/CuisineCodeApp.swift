@@ -8,12 +8,12 @@
 import SwiftUI
 
 @main
-struct MyApp: App {
+struct CuisineCodeApp: App {
     
     private let container: DependencyContainerProtocol = DependencyContainer.makeDefault()
     private let viewModelFactory: ViewModelFactory
     private let screenFactory: ScreenFactory
-    
+        
     init() {
         self.viewModelFactory = ViewModelFactory(container: container)
         self.screenFactory = ScreenFactory(viewModelFactory: viewModelFactory)
@@ -22,6 +22,7 @@ struct MyApp: App {
     var body: some Scene {
         WindowGroup {
             RootView(factory: screenFactory)
+                .environment(\.imageLoaderService, container.imageLoaderService)
         }
     }
 }

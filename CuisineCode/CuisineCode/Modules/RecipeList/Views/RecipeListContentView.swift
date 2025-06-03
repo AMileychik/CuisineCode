@@ -8,46 +8,37 @@
 import SwiftUI
 
 struct RecipeListContentView: View {
-
-    // MARK: - Properties
+    
+    let state: RecipeListState
     let showFavorites: Bool
     let displayedRecipes: [Recipe]
-    let bannerURL: URL?
-    let viewModelFactory: ViewModelFactory
     let onBannerTap: () -> Void
     let onRefresh: () async -> Void
-    let viewModel: RecipeListViewModel
-
-    @State private var selectedRecipeViewModel: RecipeDetailViewModel?
-    @State private var isNavigating = false
-
-    private let columns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 16), count: 2)
-
-    // MARK: - Body
+    let onRecipeSelect: (Recipe) -> Void
+    
+    private let columns = Array(repeating: GridItem(.flexible(), spacing: 16), count: 2)
+    
     var body: some View {
         VStack {
-            switch viewModel.state {
+            switch state {
             case .initial, .loading:
                 loadingView
+                
             case .error(let message):
                 ErrorStateView(message: message)
+                
             case .loaded:
                 loadedView
             }
         }
-        .navigationDestination(isPresented: $isNavigating) {
-            if let viewModel = selectedRecipeViewModel {
-                RecipeDetailView(viewModel: viewModel)
-            }
-        }
     }
-
-    // MARK: - Loading View
+    
+    // MARK: - Loading Indicator View
     private var loadingView: some View {
         ProgressView(Texts.RecipeListView.progressViewState)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
-
+    
     // MARK: - Loaded View
     private var loadedView: some View {
         ScrollView {
@@ -56,11 +47,11 @@ struct RecipeListContentView: View {
                     bannerView
                     recipeHeader
                 }
-
+                
                 if showFavorites {
                     favoriteHeader
                 }
-
+                
                 if displayedRecipes.isEmpty {
                     emptyFavoritesView
                 } else {
@@ -72,43 +63,39 @@ struct RecipeListContentView: View {
             await onRefresh()
         }
     }
-
-    // MARK: - Banner View
+    
+    // MARK: - Banner module
     private var bannerView: some View {
         FetchBannerView {
             onBannerTap()
         }
     }
-
+    
     // MARK: - Recipe Header
     private var recipeHeader: some View {
         HeaderView(text: Texts.RecipeListView.recipeHeader)
     }
-
+    
     // MARK: - Favorite Header
     private var favoriteHeader: some View {
         AnimatedFavoriteHeader(title: Texts.RecipeListView.favoriteRecipesHeader)
     }
-
+    
     // MARK: - Empty Favorites View
     private var emptyFavoritesView: some View {
         Text(Texts.RecipeListView.emptyFavoritesList)
             .foregroundColor(.secondary)
             .padding()
     }
-
+    
     // MARK: - Recipe Grid
     private var recipeGrid: some View {
         LazyVGrid(columns: columns, spacing: 16) {
             ForEach(displayedRecipes) { recipe in
                 Button {
-                    Task {
-                        let viewModel = await viewModelFactory.makeRecipeDetailViewModel(for: recipe)
-                        selectedRecipeViewModel = viewModel
-                        isNavigating = true
-                    }
+                    onRecipeSelect(recipe)
                 } label: {
-                    RecipeGrid(recipe: recipe, imageLoaderService: viewModel.imageLoaderService)
+                    RecipeGrid(recipe: recipe)
                 }
                 .buttonStyle(.plain)
             }
@@ -116,3 +103,5 @@ struct RecipeListContentView: View {
         .padding()
     }
 }
+
+

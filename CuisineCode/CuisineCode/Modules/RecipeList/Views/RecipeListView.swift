@@ -10,30 +10,27 @@ import SwiftUI
 struct RecipeListView: View {
     
     // MARK: - Dependencies
-    let viewModelFactory: ViewModelFactory
-    let showFavorites: Bool
+    private let screenFactory: ScreenFactory
+    private let showFavorites: Bool
     
     // MARK: - State
-    @State private var selectedURL: URL?
-    @State private var isShowingWebView: Bool = false
+    @State private var selectedRecipe: Recipe?
     @State private var tempName: String = ""
-    @State private var showNamePrompt: Bool = false
+    @State private var showNamePrompt = false
+    @AppStorage("userName") private var userName: String = ""
     @FocusState private var isNameFieldFocused: Bool
     
-    // MARK: - Storage
-    @AppStorage("userName") private var userName: String = ""
-    
     // MARK: - ViewModel
-    @StateObject private var viewModel: RecipeListViewModel
+    @ObservedObject private var viewModel: RecipeListViewModel
     
     // MARK: - Init
     init(
         viewModel: RecipeListViewModel,
-        viewModelFactory: ViewModelFactory,
+        screenFactory: ScreenFactory,
         showFavorites: Bool = false
     ) {
-        _viewModel = StateObject(wrappedValue: viewModel)
-        self.viewModelFactory = viewModelFactory
+        self.viewModel = viewModel
+        self.screenFactory = screenFactory
         self.showFavorites = showFavorites
     }
     
@@ -48,22 +45,39 @@ struct RecipeListView: View {
     var body: some View {
         ZStack {
             recipeListContent
+            
             if showNamePrompt {
                 onboardingPrompt
             }
         }
     }
     
-    // MARK: - Main Content
+    // MARK: - Main Content Layer
     private var recipeListContent: some View {
         NavigationStack {
-            RecipeListContentView(showFavorites: showFavorites, 
-                                  displayedRecipes: displayedRecipes,
-                                  bannerURL: URLs.banner,
-                                  viewModelFactory: viewModelFactory,
-                                  onBannerTap: { viewModel.openInSafari(URLs.banner, in: $isShowingWebView, selectedURL: $selectedURL) },
-                                  onRefresh: { await viewModel.loadRecipes() },
-                                  viewModel: viewModel)
+            RecipeListContentView(
+                state: viewModel.state,
+                showFavorites: showFavorites,
+                displayedRecipes: displayedRecipes,
+                onBannerTap: {
+                    viewModel.openInSafari(URLs.banner)
+                },
+                onRefresh: { await viewModel.loadRecipes() },
+                onRecipeSelect: { recipe in
+                    selectedRecipe = recipe
+                }
+            )
+            .navigationDestination(item: $selectedRecipe) { recipe in
+                screenFactory.makeRecipeDetailView(for: recipe)
+            }
+            .onChange(of: selectedRecipe) { oldValue, newValue in
+                if newValue == nil && showFavorites {
+                    viewModel.updateFavorites()
+                }
+            }
+            .sheet(item: $viewModel.selectedURL) { url in
+                SafariView(url: url)
+            }
             .navigationBarTitleDisplayMode(.inline)
             .whiteNavigationBar()
             .toolbar { toolbarItems }
@@ -72,28 +86,17 @@ struct RecipeListView: View {
                 placement: .navigationBarDrawer(displayMode: .always),
                 prompt: Texts.RecipeListView.searchRecipes
             )
-            .task(id: isShowingWebView) {
-                if !isShowingWebView && !viewModel.isLoaded {
-                    await viewModel.loadRecipes()
-                }
-            }
-            .onAppear {
-                Task {
-                    await viewModel.loadRecipes()
-                }
-                if userName.isEmpty {
-                    showNamePrompt = true
-                }
-            }
-            .sheet(isPresented: $isShowingWebView) {
-                if let url = selectedURL {
-                    SafariView(url: url)
-                }
+        }
+        .task {
+            await viewModel.loadRecipes()
+            
+            if userName.isEmpty {
+                showNamePrompt = true
             }
         }
     }
     
-    // MARK: - Onboarding Prompt
+    // MARK: - Onboarding
     private var onboardingPrompt: some View {
         OnboardingPromptView(
             isNameFieldFocused: _isNameFieldFocused,

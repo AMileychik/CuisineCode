@@ -10,25 +10,27 @@ import SwiftUI
 @MainActor
 final class ScreenFactory {
     
+    // MARK: - Dependencies
     private let viewModelFactory: ViewModelFactory
 
+    // MARK: - Init
     init(viewModelFactory: ViewModelFactory) {
         self.viewModelFactory = viewModelFactory
     }
 
-    func makeRecipeListView(showFavorites: Bool = false) -> some View {
+    // MARK: - RecipeListView Screen Builder
+    func makeRecipeListView(showFavorites: Bool = false) -> RecipeListView {
         let viewModel = viewModelFactory.makeRecipeListViewModel()
         return RecipeListView(
             viewModel: viewModel,
-            viewModelFactory: viewModelFactory,
+            screenFactory: self,
             showFavorites: showFavorites
         )
     }
 
-    func makeRecipeDetailView(for recipe: Recipe) -> some View {
+    // MARK: - RecipeDetailView Screen Builder
+    func makeRecipeDetailView(for recipe: Recipe) -> RecipeDetailView {
         let viewModel = viewModelFactory.makeRecipeDetailViewModel(for: recipe)
         return RecipeDetailView(viewModel: viewModel)
     }
 }
-
-

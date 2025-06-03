@@ -10,6 +10,7 @@ import SwiftUI
 @MainActor
 final class ViewModelFactory {
     
+    // MARK: - Dependencies
     private let container: DependencyContainerProtocol
     
     init(container: DependencyContainerProtocol = DependencyContainer.makeDefault()) {
@@ -20,8 +21,7 @@ final class ViewModelFactory {
         RecipeListViewModel(
             networkService: container.networkService,
             favoritesService: container.favoritesService,
-            imageLoaderService: container.imageLoaderService,
-            safariService: container.safariService
+            imageLoaderService: container.imageLoaderService
         )
     }
     
@@ -29,8 +29,7 @@ final class ViewModelFactory {
         RecipeDetailViewModel(
             recipe: recipe,
             favoritesService: container.favoritesService,
-            imageLoaderService: container.imageLoaderService,
-            safariService: container.safariService
+            imageLoaderService: container.imageLoaderService
         )
     }
 }

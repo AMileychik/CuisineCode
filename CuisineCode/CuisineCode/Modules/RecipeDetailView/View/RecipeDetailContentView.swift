@@ -10,9 +10,7 @@ import SwiftUI
 struct RecipeDetailContentView: View {
     
     @ObservedObject var viewModel: RecipeDetailViewModel
-    @Binding var isShowingWebView: Bool
-    @Binding var selectedURL: URL?
-    
+        
     var body: some View {
         if viewModel.isDataLoaded {
             ScrollView {
@@ -29,8 +27,7 @@ struct RecipeDetailContentView: View {
     // MARK: - Recipe Image View
     private var recipeImageView: some View {
         RecipeImageView(
-            url: viewModel.photoURLLarge,
-            imageLoaderService: viewModel.imageLoaderService
+            url: viewModel.photoURLLarge
         )
     }
     
@@ -48,20 +45,22 @@ struct RecipeDetailContentView: View {
     private var actionButtons: some View {
         VStack(spacing: 16) {
             ActionButton(
-                isShowingWebView: $isShowingWebView,
-                selectedURL: $selectedURL,
-                safariService: viewModel.safariService,
                 title: Texts.RecipeDetailView.viewRecipe,
                 gradient: [.blue, .purple],
-                url: viewModel.sourceURL
+                onTap: {
+                    if let url = viewModel.sourceURL {
+                        viewModel.openInSafari(url)
+                    }
+                }
             )
             ActionButton(
-                isShowingWebView: $isShowingWebView,
-                selectedURL: $selectedURL,
-                safariService: viewModel.safariService,
                 title: Texts.RecipeDetailView.watchOnYouTube,
                 gradient: [.red, .orange],
-                url: viewModel.youtubeURL
+                onTap: {
+                    if let url = viewModel.youtubeURL {
+                        viewModel.openInSafari(url)
+                    }
+                }
             )
         }
         .padding()
@@ -73,7 +72,11 @@ struct RecipeDetailContentView: View {
     private var partnersPromoView: some View {
         FetchPartnersPromoView(
             partners: viewModel.partners,
-            safariService: viewModel.safariService
+            onTap: { url in
+                if let url = url {
+                    viewModel.openInSafari(url)
+                }
+            }
         )
         .padding(.bottom)
     }

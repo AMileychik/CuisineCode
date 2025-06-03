@@ -26,3 +26,18 @@ struct RootView: View {
     }
 }
 
+import SwiftUI
+
+struct RootView_Previews: PreviewProvider {
+    
+    static var previews: some View {
+        
+        let container = DependencyContainer.makePreview()
+        let viewModelFactory = ViewModelFactory(container: container)
+        let screenFactory = ScreenFactory(viewModelFactory: viewModelFactory)
+        
+        RootView(factory: screenFactory)
+            .environment(\.imageLoaderService, container.imageLoaderService)
+    }
+}
+

@@ -10,11 +10,10 @@ import SwiftUI
 struct RecipeImageView: View {
     
     let url: URL?
-    let imageLoaderService: ImageLoaderServiceProtocol
     
     var body: some View {
         if let url = url {
-            CachedImageView(url: url, service: imageLoaderService)
+            CachedImageView(url: url)
                 .aspectRatio(contentMode: .fill)
                 .frame(maxWidth: .infinity, maxHeight: 450)
                 .clipped()
